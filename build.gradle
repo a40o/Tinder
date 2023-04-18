@@ -1,20 +1,20 @@
 buildscript {
-	ext {
-		springBootVersion = '1.5.9.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+    ext {
+        springBootVersion = '1.5.9.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.0.1'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id 'org.flywaydb.flyway' version '9.8.1'
+    id 'java'
+    id 'org.springframework.boot' version '3.0.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.flywaydb.flyway' version '9.8.1'
 }
 
 apply plugin: 'java'
@@ -25,33 +25,34 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-mysql'
-	implementation 'org.projectlombok:lombok:1.18.22'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation "io.jsonwebtoken:jjwt:0.9.0"
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.0.2'
-	implementation "org.flywaydb:flyway-mysql"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.springframework.boot:spring-boot-test-autoconfigure:3.0.2'
+    implementation 'org.springframework:spring-test:6.0.2'
+    implementation 'mysql:mysql-connector-java:8.0.28'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.2'
+    implementation 'org.passay:passay:1.6.1'
 }
 
-flyway{
-	locations = ['filesystem:./sql']
-	url = 'jdbc:mysql://localhost:3306/tinder'
-	user = 'a4ko'
-	password = '123456'
-	driver = 'com.mysql.cj.jdbc.Driver'
-	schemas = ['tinder']
+flyway {
+    locations = ['filesystem:./sql']
+    url = 'jdbc:mysql://localhost:3306/tinder'
+    user = 'a4ko'
+    password = '123456'
+    driver = 'com.mysql.cj.jdbc.Driver'
+    schemas = ['tinder']
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
