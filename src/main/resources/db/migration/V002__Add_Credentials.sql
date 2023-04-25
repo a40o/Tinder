@@ -1,4 +1,4 @@
-insert into USER(
+insert into user(
 FIRST_NAME,
 LAST_NAME,
 EMAIL,
@@ -8,6 +8,6 @@ GENDER
 'Kristin',
 'Petkov',
 'da@abv.bg',
-'123',
-'female'
+'1Aa!qwerty',
+'FEMALE'
 );

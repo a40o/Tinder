@@ -1,6 +1,6 @@
 SELECT CURRENT_TIMESTAMP;
 
-CREATE TABLE USER(
+CREATE TABLE user(
     ID int not null AUTO_INCREMENT PRIMARY KEY,
     FIRST_NAME varchar(50) not null,
     LAST_NAME varchar(50) not null,

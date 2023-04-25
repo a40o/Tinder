@@ -1,8 +1,11 @@
 package com.volasoftware.tinder.dto;
 
+import com.volasoftware.tinder.annotation.Password;
 import com.volasoftware.tinder.model.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
+import java.time.LocalDateTime;
 
 public class UserDto {
 
@@ -13,6 +16,7 @@ public class UserDto {
     private String lastName;
 
     @NotBlank(message = "No password provided")
+    @Password
     private String password;
 
     @NotBlank(message = "No email provided")
@@ -20,7 +24,10 @@ public class UserDto {
     private String email;
 
     @NotBlank(message = "No gender provided")
-    Gender gender;
+    private String gender;
+
+    private LocalDateTime createdDate;
+    private LocalDateTime lastModified;
 
     public String getFirstName() {
         return firstName;
@@ -54,11 +61,27 @@ public class UserDto {
         this.email = email;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
     }
 }
