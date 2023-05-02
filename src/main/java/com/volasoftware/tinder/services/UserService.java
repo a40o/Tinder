@@ -1,6 +1,7 @@
 package com.volasoftware.tinder.services;
 
 import com.volasoftware.tinder.dto.UserDto;
+import com.volasoftware.tinder.exception.EmailAlreadyRegisteredException;
 import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.repository.UserRepository;
@@ -24,6 +25,9 @@ public class UserService {
     }
 
     public void registerUser(UserDto userDto) {
+        if (isEmailRegistered(userDto.getEmail())) {
+            throw new EmailAlreadyRegisteredException("Email already exist!");
+        }
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setFirstName(userDto.getFirstName());
@@ -37,4 +41,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public boolean isEmailRegistered(String email) {
+        return userRepository.findOneByEmail(email).isPresent();
+    }
 }
