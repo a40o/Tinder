@@ -1,13 +1,15 @@
 package com.volasoftware.tinder.model;
 
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "token")
-public class Token extends Auditable<String>{
+@NoArgsConstructor
+public class Token extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -16,10 +18,13 @@ public class Token extends Auditable<String>{
     private long userId;
 
     @Column(name = "TOKEN")
-    private UUID token;
+    private String token;
 
     @Column(name = "EXPIRATION_DATE")
-    LocalDateTime expirationDate;
+    private LocalDateTime expirationDate;
+
+    @Column(name = "CREATION_DATE")
+    private LocalDateTime creationDate;
 
     public long getId() {
         return id;
@@ -37,16 +42,27 @@ public class Token extends Auditable<String>{
         this.userId = userId;
     }
 
-    public UUID getToken() {
+    public String getToken() {
         return token;
     }
 
-    public void setToken(UUID token) {
+    public void setToken(String token) {
         this.token = token;
     }
 
     @PrePersist
-    public void init(){
+    public void init() {
+        creationDate = LocalDateTime.now();
         expirationDate = LocalDateTime.now();
+    }
+
+    public Token(String token,
+                 LocalDateTime createdAt,
+                 LocalDateTime expirationDate,
+                 User user) {
+        this.token = token;
+        this.creationDate = createdAt;
+        this.expirationDate = expirationDate;
+        this.userId = user.getId();
     }
 }
