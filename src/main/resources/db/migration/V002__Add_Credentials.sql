@@ -3,7 +3,8 @@ FIRST_NAME,
 LAST_NAME,
 EMAIL,
 PASSWORD,
-GENDER
+GENDER,
+ENABLED
 ) values(
 'Kristin',
 'Petkov',
