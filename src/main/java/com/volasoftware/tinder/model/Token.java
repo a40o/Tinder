@@ -14,17 +14,15 @@ public class Token extends Auditable<String> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "USER_ID")
-    private long userId;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @Column(name = "TOKEN")
     private String token;
 
     @Column(name = "EXPIRATION_DATE")
     private LocalDateTime expirationDate;
-
-    @Column(name = "CREATION_DATE")
-    private LocalDateTime creationDate;
 
     public long getId() {
         return id;
@@ -34,12 +32,12 @@ public class Token extends Auditable<String> {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
+    public User user() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getToken() {
@@ -50,19 +48,12 @@ public class Token extends Auditable<String> {
         this.token = token;
     }
 
-    @PrePersist
-    public void init() {
-        creationDate = LocalDateTime.now();
-        expirationDate = LocalDateTime.now();
-    }
-
     public Token(String token,
                  LocalDateTime createdAt,
                  LocalDateTime expirationDate,
                  User user) {
         this.token = token;
-        this.creationDate = createdAt;
         this.expirationDate = expirationDate;
-        this.userId = user.getId();
+        this.user = user;
     }
 }

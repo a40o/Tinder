@@ -1,0 +1,2 @@
+Alter TABLE user
+ADD COLUMN ENABLED boolean AFTER GENDER;

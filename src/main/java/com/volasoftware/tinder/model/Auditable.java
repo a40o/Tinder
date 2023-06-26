@@ -1,9 +1,6 @@
 package com.volasoftware.tinder.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,13 +22,19 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Auditable<U> {
 
-    @CreatedDate
-    @Temporal(TIMESTAMP)
     @Column(name = "CREATED_DATE")
     protected LocalDateTime createdDate;
 
-    @LastModifiedDate
-    @Temporal(TIMESTAMP)
     @Column(name = "LAST_MODIFIED")
     protected LocalDateTime lastModified;
+
+    @PrePersist
+    private void init(){
+        createdDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void modify(){
+        lastModified = LocalDateTime.now();
+    }
 }

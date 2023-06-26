@@ -15,21 +15,23 @@ public class User extends Auditable<String> {
 
     @Column(name = "FIRST_NAME")
     String firstName;
+
     @Column(name = "LAST_NAME")
     String lastName;
+
     @Column(name = "EMAIL")
     String email;
+
     @Column(name = "PASSWORD")
     String password;
+
     @Column(name = "GENDER")
     @Enumerated(value = EnumType.STRING)
     Gender gender;
 
-    @Column(name = "CREATED_DATE")
-    LocalDateTime createdDate;
+    @Column(name = "ENABLED")
+    private boolean enabled;
 
-    @Column(name = "LAST_MODIFIED")
-    LocalDateTime lastModified;
 
     public long getId() {
         return id;
@@ -79,10 +81,11 @@ public class User extends Auditable<String> {
         this.gender = gender;
     }
 
-    @PrePersist
-    public void init() {
-        createdDate = LocalDateTime.now();
-        lastModified = LocalDateTime.now();
+    public boolean isEnabled() {
+        return enabled;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 }
