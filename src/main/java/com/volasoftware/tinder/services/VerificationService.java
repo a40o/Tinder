@@ -21,6 +21,7 @@ public class VerificationService{
 
     public VerificationService(VerificationRepository verificationRepository,
                 UserRepository userRepository) {
+
             this.verificationRepository = verificationRepository;
             this.userRepository = userRepository;
         }
@@ -31,14 +32,10 @@ public class VerificationService{
 
             if(tokenEntity.getExpirationDate().isAfter(LocalDateTime.now())){
                 User userToVerify = tokenEntity.getUserId();
-
                 userToVerify.setEnabled(true);
-
                 userRepository.save(userToVerify);
-
                 return true;
             }
-
             return false;
         }
     }
