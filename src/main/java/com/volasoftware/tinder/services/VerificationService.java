@@ -16,9 +16,7 @@ public class VerificationService{
     private final UserRepository userRepository;
 
     public void saveVerificationToken(Verification token){
-
         verificationRepository.save(token);
-
     }
 
     public VerificationService(VerificationRepository verificationRepository,

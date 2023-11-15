@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Entity
-@Table(name = "verification_tokens")
+@Table(name = "token")
 public class Verification {
 
     @Id

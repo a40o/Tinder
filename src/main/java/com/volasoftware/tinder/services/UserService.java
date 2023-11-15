@@ -3,17 +3,16 @@ package com.volasoftware.tinder.services;
 import com.volasoftware.tinder.dto.UserDto;
 import com.volasoftware.tinder.exception.EmailAlreadyRegisteredException;
 import com.volasoftware.tinder.model.Gender;
-import com.volasoftware.tinder.model.Token;
 import com.volasoftware.tinder.model.User;
-import com.volasoftware.tinder.repository.TokenRepository;
+import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.core.io.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -32,16 +31,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final VerificationRepository verificationRepository;
     private final ResourceLoader resourceLoader;
-    private final TokenRepository tokenRepository;
-    @Autowired
-    private EmailSenderService senderService;
+    private JavaMailSender mailSender;
 
-    public UserService(UserRepository userRepository, VerificationRepository verificationRepository, ResourceLoader resourceLoader, TokenRepository tokenRepository, EmailSenderService senderService) {
+    public UserService(UserRepository userRepository,
+                       VerificationRepository verificationRepository,
+                       ResourceLoader resourceLoader,
+                       JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.resourceLoader = resourceLoader;
-        this.tokenRepository = tokenRepository;
-        this.senderService = senderService;
+        this.mailSender = mailSender;
     }
 
     public List<User> getAll() {
@@ -49,7 +48,7 @@ public class UserService {
     }
 
     private String getEmailContent(String token) throws IOException{
-        Resource emailResource = resourceLoader.getResource("classpath:email/ConfirmationPage.html");
+        Resource emailResource = resourceLoader.getResource("classpath:emailResources/ConfirmationPage.html");
 
         File emailFile = emailResource.getFile();
         Path path = Path.of(emailFile.getPath());
@@ -72,31 +71,22 @@ public class UserService {
         user.setEnabled(false);
         userRepository.saveAndFlush(user);
 
-        String uuid = UUID.randomUUID().toString();
-        Token token = new Token(
-                uuid,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(2),
-                user
-        );
+        Verification token = new Verification();
+        token.setUserId(user);
+        token.setToken(UUID.randomUUID().toString());
+        token.setCreatedDate(LocalDateTime.now());
+        token.setExpirationDate(LocalDateTime.now().plusDays(2));
+        verificationRepository.saveAndFlush(token);
 
-        tokenRepository.save(token);
-
-        sendMail();
-        //return token;
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setFrom(new InternetAddress("ang3lkirilov@gmail.com"));
+        message.setRecipients(MimeMessage.RecipientType.TO,user.getEmail());
+        message.setSubject("Verification");
+        message.setContent(getEmailContent(token.getToken()),"text/html; charset=utf-8");
+        mailSender.send(message);
     }
 
     public Optional<User> getById(Long id) {
         return userRepository.findById(id);
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void sendMail() throws MessagingException, IOException {
-
-        senderService.sendEmail("angelkirilov6@protonmail.com",
-                "Verification Email",
-                "",
-                "/home/a4ko/Codes/Java/Tinder/src/main/resources/emailResources/ConfirmationPage.html"
-        );
     }
 }

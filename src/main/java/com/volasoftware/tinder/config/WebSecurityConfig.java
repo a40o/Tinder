@@ -22,7 +22,6 @@ public class WebSecurityConfig {
 
     private static final String[] WHITELIST = {
             "/api/v1/users/register"
-
     };
 
     @Bean
