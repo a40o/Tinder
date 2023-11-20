@@ -24,23 +24,23 @@ public class Verification {
     @Column(name = "EXPIRATION_DATE")
     private LocalDateTime expirationDate;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "USER_ID")
-    private User userId;
+    @JoinColumn(name = "USER")
+    private User user;
 
     public User getId() {
-        return userId;
+        return user;
     }
 
     public void setId(User userId) {
-        this.userId = userId;
+        this.user = userId;
     }
 
-    public User getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(User userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getToken() {

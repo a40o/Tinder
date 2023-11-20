@@ -31,7 +31,7 @@ public class VerificationService{
                     .orElseThrow(() -> new InvalidVerificationTokenException("Invalid token"));
 
             if(tokenEntity.getExpirationDate().isAfter(LocalDateTime.now())){
-                User userToVerify = tokenEntity.getUserId();
+                User userToVerify = tokenEntity.getUser();
                 userToVerify.setEnabled(true);
                 userRepository.save(userToVerify);
                 return true;

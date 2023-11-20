@@ -72,7 +72,7 @@ public class UserService {
         userRepository.saveAndFlush(user);
 
         Verification token = new Verification();
-        token.setUserId(user);
+        token.setUser(user);
         token.setToken(UUID.randomUUID().toString());
         token.setCreatedDate(LocalDateTime.now());
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
