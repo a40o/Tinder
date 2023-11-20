@@ -1,6 +1,6 @@
 package com.volasoftware.tinder.services;
 
-import com.volasoftware.tinder.exception.InvalidVerificationToken;
+import com.volasoftware.tinder.exception.InvalidVerificationTokenException;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
@@ -28,7 +28,7 @@ public class VerificationService{
         public boolean verifyUser(String token){
 
             Verification tokenEntity = verificationRepository.findByToken(token)
-                    .orElseThrow(() -> new InvalidVerificationToken("Invalid token"));
+                    .orElseThrow(() -> new InvalidVerificationTokenException("Invalid token"));
 
             if(tokenEntity.getExpirationDate().isAfter(LocalDateTime.now())){
                 User userToVerify = tokenEntity.getUserId();
