@@ -14,20 +14,20 @@ public class User extends Auditable<String> {
     private long id;
 
     @Column(name = "FIRST_NAME")
-    String firstName;
+    private String firstName;
 
     @Column(name = "LAST_NAME")
-    String lastName;
+    private String lastName;
 
     @Column(name = "EMAIL")
-    String email;
+    private String email;
 
     @Column(name = "PASSWORD")
-    String password;
+    private String password;
 
     @Column(name = "GENDER")
     @Enumerated(value = EnumType.STRING)
-    Gender gender;
+    private Gender gender;
 
     @Column(name = "ENABLED")
     private boolean enabled;

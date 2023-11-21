@@ -32,9 +32,6 @@ public class UserDto {
     @NotBlank(message = "No gender provided")
     private String gender;
 
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModified;
-
     public String getFirstName() {
         return firstName;
     }
@@ -73,21 +70,5 @@ public class UserDto {
 
     public void setGender(String gender) {
         this.gender = gender;
-    }
-
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(LocalDateTime lastModified) {
-        this.lastModified = lastModified;
     }
 }
