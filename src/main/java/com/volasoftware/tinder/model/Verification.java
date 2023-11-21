@@ -27,20 +27,12 @@ public class Verification {
     @JoinColumn(name = "USER")
     private User user;
 
-    public User getId() {
-        return user;
+    public Long getId() {
+        return id;
     }
 
-    public void setId(User userId) {
-        this.user = userId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getToken() {
@@ -49,10 +41,6 @@ public class Verification {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public LocalDateTime getCreatedDate() {
@@ -69,5 +57,13 @@ public class Verification {
 
     public void setExpirationDate(LocalDateTime expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
