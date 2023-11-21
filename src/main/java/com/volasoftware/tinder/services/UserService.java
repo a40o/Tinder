@@ -32,30 +32,24 @@ public class UserService {
     private final VerificationRepository verificationRepository;
     private final ResourceLoader resourceLoader;
     private JavaMailSender mailSender;
+    private final EmailSenderService emailSenderService;
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
                        ResourceLoader resourceLoader,
-                       JavaMailSender mailSender) {
+                       JavaMailSender mailSender,
+                       EmailSenderService emailSenderService) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.resourceLoader = resourceLoader;
         this.mailSender = mailSender;
+        this.emailSenderService = emailSenderService;
     }
 
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    private String getEmailContent(String token) throws IOException{
-        Resource emailResource = resourceLoader.getResource("classpath:emailResources/ConfirmationPage.html");
-
-        File emailFile = emailResource.getFile();
-        Path path = Path.of(emailFile.getPath());
-        String emailContent = Files.readString(path);
-
-        return  emailContent.replace("{{token}}" , "http://localhost:8080/verify/" + token);
-    }
     public void registerUser(UserDto userDto) throws MessagingException, IOException {
 
         if(userRepository.findOneByEmail(userDto.getEmail()).isPresent()) {
@@ -78,12 +72,11 @@ public class UserService {
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
         verificationRepository.saveAndFlush(token);
 
-        MimeMessage message = mailSender.createMimeMessage();
-        message.setFrom(new InternetAddress("ang3lkirilov@gmail.com"));
-        message.setRecipients(MimeMessage.RecipientType.TO,user.getEmail());
-        message.setSubject("Verification");
-        message.setContent(getEmailContent(token.getToken()),"text/html; charset=utf-8");
-        mailSender.send(message);
+        emailSenderService.sendEmail(user,
+                token,
+                "ang3lkirilov@gmail.com",
+                "Verification",
+                "text/html; charset=utf-8");
     }
 
     public Optional<User> getById(Long id) {
