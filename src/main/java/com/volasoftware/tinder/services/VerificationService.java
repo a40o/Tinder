@@ -23,6 +23,7 @@ public class VerificationService{
     private final EmailSenderService emailSenderService;
 
     public void saveVerificationToken(Verification token){
+
         verificationRepository.save(token);
     }
 
