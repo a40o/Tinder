@@ -73,10 +73,7 @@ public class UserService {
         verificationRepository.saveAndFlush(token);
 
         emailSenderService.sendEmail(user,
-                token,
-                "ang3lkirilov@gmail.com",
-                "Verification",
-                "text/html; charset=utf-8");
+                token);
     }
 
     public Optional<User> getById(Long id) {

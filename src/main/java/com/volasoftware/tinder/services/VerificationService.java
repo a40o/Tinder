@@ -70,10 +70,5 @@ public class VerificationService{
             newToken.setExpirationDate(LocalDateTime.now().plusDays(2));
             verificationRepository.saveAndFlush(newToken);
 
-            emailSenderService.sendEmail(user,
-                    newToken,
-                    "ang3lkirilov@gmail.com",
-                    "Verification",
-                    "text/html; charset=utf-8");
-        }
+            emailSenderService.sendEmail(user, newToken);}
     }
