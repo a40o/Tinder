@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface VerificationRepository extends JpaRepository<Verification, Long> {
 
     Optional<Verification> findByToken(String token);
+
+    Optional<Verification> findTokenByUserId(Long userId);
 }
