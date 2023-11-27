@@ -59,9 +59,7 @@ public class VerificationService{
                 throw new UserAlreadyVerifiedException("User is already verified!");
             }
 
-            Optional<Verification> oldToken = verificationRepository.findTokenByUserId(user.getId());
-
-            oldToken.ifPresent(verificationRepository::delete);
+            verificationRepository.findTokenByUserId(user.getId()).ifPresent(verificationRepository::delete);
 
             Verification newToken = new Verification();
             newToken.setUser(user);
