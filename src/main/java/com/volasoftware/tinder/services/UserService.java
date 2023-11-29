@@ -8,21 +8,13 @@ import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -33,17 +25,21 @@ public class UserService {
     private final ResourceLoader resourceLoader;
     private JavaMailSender mailSender;
     private final EmailSenderService emailSenderService;
+    private final VerificationService verificationService;
+    private final Set<User> users = new HashSet<User>();
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
                        ResourceLoader resourceLoader,
                        JavaMailSender mailSender,
-                       EmailSenderService emailSenderService) {
+                       EmailSenderService emailSenderService,
+                       VerificationService verificationService) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.resourceLoader = resourceLoader;
         this.mailSender = mailSender;
         this.emailSenderService = emailSenderService;
+        this.verificationService = verificationService;
     }
 
     public List<User> getAll() {
@@ -64,6 +60,7 @@ public class UserService {
         user.setGender(Gender.valueOf(userDto.getGender()));
         user.setEnabled(false);
         userRepository.saveAndFlush(user);
+        users.add(user);
 
         Verification token = new Verification();
         token.setUser(user);
@@ -72,8 +69,9 @@ public class UserService {
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
         verificationRepository.saveAndFlush(token);
 
-        emailSenderService.sendEmail(user,
-                token);
+            emailSenderService.sendEmail("Verification",
+                    Collections.singleton(user.getEmail()),
+                    verificationService.setVerificationLink(String.valueOf(token)));
     }
 
     public Optional<User> getById(Long id) {
