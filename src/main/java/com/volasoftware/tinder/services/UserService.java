@@ -8,8 +8,6 @@ import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,22 +20,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final VerificationRepository verificationRepository;
-    private final ResourceLoader resourceLoader;
-    private JavaMailSender mailSender;
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
     private final Set<User> users = new HashSet<User>();
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
-                       ResourceLoader resourceLoader,
-                       JavaMailSender mailSender,
                        EmailSenderService emailSenderService,
                        VerificationService verificationService) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
-        this.resourceLoader = resourceLoader;
-        this.mailSender = mailSender;
         this.emailSenderService = emailSenderService;
         this.verificationService = verificationService;
     }

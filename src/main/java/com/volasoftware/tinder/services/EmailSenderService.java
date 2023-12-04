@@ -1,11 +1,9 @@
 package com.volasoftware.tinder.services;
 
-import com.volasoftware.tinder.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +15,11 @@ public class EmailSenderService {
 
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
-    private String emailSender;
-    private final UserRepository userRepository;
+    private final String emailSender;
 
-    public EmailSenderService(JavaMailSender mailSender,
-                              ResourceLoader resourceLoader,
-                              UserRepository userRepository) {
+    public EmailSenderService(JavaMailSender mailSender, String emailSender) {
         this.mailSender = mailSender;
-        this.userRepository = userRepository;
+        this.emailSender = emailSender;
     }
 
     public void sendEmail(String emailSubject,
