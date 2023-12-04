@@ -80,7 +80,8 @@ public class VerificationService{
 
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
-                    setVerificationLink(newToken.getToken()));}
+                    setVerificationLink(newToken.getToken()));
+        }
 
             public String setVerificationLink(String token) throws IOException{
 
