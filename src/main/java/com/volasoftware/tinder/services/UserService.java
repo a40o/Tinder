@@ -8,21 +8,11 @@ import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -30,32 +20,24 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final VerificationRepository verificationRepository;
-    private final ResourceLoader resourceLoader;
-    private JavaMailSender mailSender;
+    private final EmailSenderService emailSenderService;
+    private final VerificationService verificationService;
+    private final Set<User> users = new HashSet<User>();
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
-                       ResourceLoader resourceLoader,
-                       JavaMailSender mailSender) {
+                       EmailSenderService emailSenderService,
+                       VerificationService verificationService) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
-        this.resourceLoader = resourceLoader;
-        this.mailSender = mailSender;
+        this.emailSenderService = emailSenderService;
+        this.verificationService = verificationService;
     }
 
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    private String getEmailContent(String token) throws IOException{
-        Resource emailResource = resourceLoader.getResource("classpath:emailResources/ConfirmationPage.html");
-
-        File emailFile = emailResource.getFile();
-        Path path = Path.of(emailFile.getPath());
-        String emailContent = Files.readString(path);
-
-        return  emailContent.replace("{{token}}" , "http://localhost:8080/verify/" + token);
-    }
     public void registerUser(UserDto userDto) throws MessagingException, IOException {
 
         if(userRepository.findOneByEmail(userDto.getEmail()).isPresent()) {
@@ -70,6 +52,7 @@ public class UserService {
         user.setGender(Gender.valueOf(userDto.getGender()));
         user.setEnabled(false);
         userRepository.saveAndFlush(user);
+        users.add(user);
 
         Verification token = new Verification();
         token.setUser(user);
@@ -78,12 +61,9 @@ public class UserService {
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
         verificationRepository.saveAndFlush(token);
 
-        MimeMessage message = mailSender.createMimeMessage();
-        message.setFrom(new InternetAddress("ang3lkirilov@gmail.com"));
-        message.setRecipients(MimeMessage.RecipientType.TO,user.getEmail());
-        message.setSubject("Verification");
-        message.setContent(getEmailContent(token.getToken()),"text/html; charset=utf-8");
-        mailSender.send(message);
+            emailSenderService.sendEmail("Verification",
+                    Collections.singleton(user.getEmail()),
+                    verificationService.setVerificationLink(String.valueOf(token)));
     }
 
     public Optional<User> getById(Long id) {
