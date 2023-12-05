@@ -83,14 +83,14 @@ public class VerificationService{
                     setVerificationLink(newToken.getToken()));
         }
 
-            public String setVerificationLink(String token) throws IOException{
+        public String setVerificationLink(String token) throws IOException{
 
-                Resource emailResource = resourceLoader.getResource("classpath:emailResources/ConfirmationPage.html");
+            Resource emailResource = resourceLoader.getResource("classpath:emailResources/ConfirmationPage.html");
 
-                File emailFile = emailResource.getFile();
-                Path path = Path.of(emailFile.getPath());
-                String emailContent = Files.readString(path);
+            File emailFile = emailResource.getFile();
+            Path path = Path.of(emailFile.getPath());
+            String emailContent = Files.readString(path);
 
-                return  emailContent.replace("{{token}}" , hostLink + "verify/" + token);
-            }
-    }
+            return  emailContent.replace("{{token}}" , hostLink + "verify/" + token);
+        }
+}

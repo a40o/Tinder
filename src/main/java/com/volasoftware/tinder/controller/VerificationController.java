@@ -15,7 +15,7 @@ import java.io.IOException;
 public class VerificationController {
 
     private final VerificationService verificationService;
-
+    
     public VerificationController(VerificationService verificationService) {
         this.verificationService = verificationService;
     }
