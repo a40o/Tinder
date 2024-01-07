@@ -13,14 +13,14 @@ import java.util.Set;
 @Service
 public class EmailSenderService {
 
-    private final JavaMailSender mailSender;
+    private  JavaMailSender mailSender;
     @Value("${spring.mail.username}")
-    private final String emailSender;
+    private  String emailSender;
 
-    public EmailSenderService(JavaMailSender mailSender, String emailSender) {
-        this.mailSender = mailSender;
-        this.emailSender = emailSender;
-    }
+//    public EmailSenderService(JavaMailSender mailSender, String emailSender) {
+//        this.mailSender = mailSender;
+//        this.emailSender = emailSender;
+//    }
 
     public void sendEmail(String emailSubject,
                           Set<String> userEmails,

@@ -1,3 +1,5 @@
+package com.volasoftware.tinder.jwt;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtService {

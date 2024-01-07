@@ -1,13 +1,18 @@
 package com.volasoftware.tinder.services;
 
+import com.volasoftware.tinder.dto.LoginUserDto;
 import com.volasoftware.tinder.dto.UserDto;
 import com.volasoftware.tinder.exception.EmailAlreadyRegisteredException;
+import com.volasoftware.tinder.exception.PasswordDoesNotMatchException;
+import com.volasoftware.tinder.exception.UserDoesNotExistException;
+import com.volasoftware.tinder.exception.UserIsNotVerifiedException;
 import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -64,6 +69,20 @@ public class UserService {
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
                     verificationService.setVerificationLink(String.valueOf(token)));
+    }
+
+    public User loginUser(LoginUserDto input) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = userRepository.findOneByEmail(input.getEmail()).orElseThrow(
+                () -> new UserDoesNotExistException("User with this email does not exist"));
+        if (!passwordEncoder.matches(input.getPassword(),
+                user.getPassword())) {
+            throw new PasswordDoesNotMatchException("Password does not match");
+        }
+        if(!user.isEnabled()){
+            throw new UserIsNotVerifiedException("The email is not verified");
+        }
+        return user;
     }
 
     public Optional<User> getById(Long id) {
