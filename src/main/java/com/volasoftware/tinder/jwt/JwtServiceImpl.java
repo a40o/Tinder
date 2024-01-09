@@ -1,5 +1,6 @@
 package com.volasoftware.tinder.jwt;
 
+import com.volasoftware.tinder.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,7 +26,8 @@ public class JwtServiceImpl implements JwtService{
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(UserDetails userDetails){
+    @Override
+    public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 

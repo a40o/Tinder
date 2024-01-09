@@ -5,7 +5,7 @@ CREATE TABLE user(
     FIRST_NAME varchar(50) not null,
     LAST_NAME varchar(50) not null,
     EMAIL varchar(50) not null,
-    PASSWORD varchar(50) not null,
+    PASSWORD varchar(255) not null,
     GENDER varchar(50) not null,
     CREATED_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
     LAST_MODIFIED DATETIME DEFAULT CURRENT_TIMESTAMP

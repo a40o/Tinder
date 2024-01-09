@@ -1,13 +1,12 @@
 package com.volasoftware.tinder.controller;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
-import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.jwt.JwtService;
 import com.volasoftware.tinder.services.UserService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,11 +23,7 @@ public class LoginController {
 
     @PostMapping("/api/v1/users/login")
     public ResponseEntity loginUser(@Valid @RequestBody LoginUserDto loginUserDto) {
-        User authenticatedUser = userService.loginUser(loginUserDto);
-
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-
-
+        String jwtToken = jwtService.generateToken(userService.loginUser(loginUserDto));
         return ResponseEntity.ok(jwtToken);
     }
 }
