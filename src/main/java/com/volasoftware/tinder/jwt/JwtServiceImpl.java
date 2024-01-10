@@ -1,6 +1,5 @@
 package com.volasoftware.tinder.jwt;
 
-import com.volasoftware.tinder.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -57,7 +56,6 @@ public class JwtServiceImpl implements JwtService{
     private Date extractExpiration(String token){
         return extractClaim(token, Claims::getExpiration);
     }
-
 
     private Claims extractAllClaims(String token){
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();

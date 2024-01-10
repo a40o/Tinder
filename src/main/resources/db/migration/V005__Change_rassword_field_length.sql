@@ -1,0 +1,1 @@
+ALTER TABLE user MODIFY COLUMN PASSWORD varchar (255) not null;

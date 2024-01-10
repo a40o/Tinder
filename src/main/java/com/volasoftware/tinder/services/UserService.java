@@ -13,6 +13,8 @@ import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,10 @@ public class UserService {
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
     private final Set<User> users = new HashSet<User>();
+    @Bean
+    private final BCryptPasswordEncoder encodePassword(){
+        return new BCryptPasswordEncoder();
+    };
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
@@ -47,8 +53,6 @@ public class UserService {
 
     public void registerUser(UserDto userDto) throws MessagingException, IOException {
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
         if(userRepository.findOneByEmail(userDto.getEmail()).isPresent()) {
             throw new EmailAlreadyRegisteredException("This email is already registered!");
         }
@@ -57,7 +61,7 @@ public class UserService {
         user.setEmail(userDto.getEmail());
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setPassword(encodePassword().encode(userDto.getPassword()));
         user.setGender(Gender.valueOf(userDto.getGender()));
         user.setEnabled(false);
         user.setRole(Role.USER);
@@ -77,10 +81,10 @@ public class UserService {
     }
 
     public User loginUser(LoginUserDto input) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         User user = userRepository.findOneByEmail(input.getEmail()).orElseThrow(
                 () -> new UserDoesNotExistException("User with this email does not exist"));
-        if (!passwordEncoder.matches(input.getPassword(), user.getPassword())) {
+        if (!encodePassword().matches(input.getPassword(), user.getPassword())) {
             throw new PasswordDoesNotMatchException("Password does not match");
         }
         if(!user.isEnabled()){
@@ -93,7 +97,7 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService getUserByUsername() {
         return username -> userRepository.findOneByEmail(username).orElseThrow();
     }
 }

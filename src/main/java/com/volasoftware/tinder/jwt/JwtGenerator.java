@@ -19,6 +19,5 @@ public class JwtGenerator {
                 .setExpiration(expiration)
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
-
     }
 }
