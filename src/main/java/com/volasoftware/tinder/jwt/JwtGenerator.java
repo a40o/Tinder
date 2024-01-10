@@ -2,12 +2,14 @@ package com.volasoftware.tinder.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 
 public class JwtGenerator {
     private static final String SECRET_KEY = "UnbreakableSecretKey";
-    private static final long EXPIRATION_TIME =604800000L;
+    @Value("$jwt_expiration_time")
+    private static int EXPIRATION_TIME;
 
     public static String generateToken(String username){
         Date now = new Date();
