@@ -15,11 +15,10 @@ public class EmailSenderService {
 
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
-    private final String emailSender;
+    private String emailSender;
 
-    public EmailSenderService(JavaMailSender mailSender, String emailSender) {
+    public EmailSenderService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-        this.emailSender = emailSender;
     }
 
     public void sendEmail(String emailSubject,

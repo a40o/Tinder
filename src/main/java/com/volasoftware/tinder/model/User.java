@@ -2,13 +2,18 @@ package com.volasoftware.tinder.model;
 
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 
 @Entity
 @Table(name = "user")
-public class User extends Auditable<String> {
+public class User extends Auditable<String> implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -32,6 +37,8 @@ public class User extends Auditable<String> {
     @Column(name = "ENABLED")
     private boolean enabled;
 
+    @Column(name = "ROLE")
+    private Role role;
 
     public long getId() {
         return id;
@@ -65,8 +72,33 @@ public class User extends Auditable<String> {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     public void setPassword(String password) {
@@ -87,5 +119,13 @@ public class User extends Auditable<String> {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }

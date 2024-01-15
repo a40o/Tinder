@@ -1,13 +1,22 @@
 package com.volasoftware.tinder.services;
 
+import com.volasoftware.tinder.dto.LoginUserDto;
 import com.volasoftware.tinder.dto.UserDto;
 import com.volasoftware.tinder.exception.EmailAlreadyRegisteredException;
+import com.volasoftware.tinder.exception.PasswordDoesNotMatchException;
+import com.volasoftware.tinder.exception.UserDoesNotExistException;
+import com.volasoftware.tinder.exception.UserIsNotVerifiedException;
 import com.volasoftware.tinder.model.Gender;
+import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,6 +32,10 @@ public class UserService {
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
     private final Set<User> users = new HashSet<User>();
+    @Bean
+    private final BCryptPasswordEncoder encodePassword(){
+        return new BCryptPasswordEncoder();
+    };
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
@@ -48,9 +61,10 @@ public class UserService {
         user.setEmail(userDto.getEmail());
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(encodePassword().encode(userDto.getPassword()));
         user.setGender(Gender.valueOf(userDto.getGender()));
         user.setEnabled(false);
+        user.setRole(Role.USER);
         userRepository.saveAndFlush(user);
         users.add(user);
 
@@ -66,7 +80,24 @@ public class UserService {
                     verificationService.setVerificationLink(String.valueOf(token)));
     }
 
+    public User loginUser(LoginUserDto input) {
+
+        User user = userRepository.findOneByEmail(input.getEmail()).orElseThrow(
+                () -> new UserDoesNotExistException("User with this email does not exist"));
+        if (!encodePassword().matches(input.getPassword(), user.getPassword())) {
+            throw new PasswordDoesNotMatchException("Password does not match");
+        }
+        if(!user.isEnabled()){
+            throw new UserIsNotVerifiedException("The email is not verified");
+        }
+        return user;
+    }
+
     public Optional<User> getById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public UserDetailsService getUserByUsername() {
+        return username -> userRepository.findOneByEmail(username).orElseThrow();
     }
 }

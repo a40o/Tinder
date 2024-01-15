@@ -1,0 +1,1 @@
+ALTER TABLE user MODIFY COLUMN ROLE varchar (50) not null;
