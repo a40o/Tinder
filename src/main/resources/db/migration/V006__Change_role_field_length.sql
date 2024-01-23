@@ -1,1 +1,1 @@
-ALTER TABLE user MODIFY COLUMN ROLE varchar (50) not null;
+ALTER TABLE user MODIFY COLUMN ROLE varchar (50) not null DEFAULT 'USER';
