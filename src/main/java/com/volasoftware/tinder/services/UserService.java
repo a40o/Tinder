@@ -79,7 +79,6 @@ public class UserService {
     }
 
     public void editUser(UserDto input) throws MessagingException, IOException{
-
         User user = getLoggedUser();
         user.setEmail(input.getEmail());
         user.setFirstName(input.getFirstName());
@@ -112,8 +111,8 @@ public class UserService {
     public User getLoggedUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication.getName();
-        return userRepository
-                .findOneByEmail(currentUser)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+    return userRepository
+        .findOneByEmail(currentUser)
+        .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
     }
 }
