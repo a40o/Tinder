@@ -75,7 +75,7 @@ public class UserService {
 
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
-                    verificationService.setVerificationLink(String.valueOf(token)));
+                    verificationService.setVerificationLink(token.getToken()));
     }
 
     public void editUser(UserDto input) throws MessagingException, IOException{
