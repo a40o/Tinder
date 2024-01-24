@@ -2,8 +2,8 @@ package com.volasoftware.tinder.services;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
 import com.volasoftware.tinder.dto.UserDto;
+import com.volasoftware.tinder.dto.UserProfileDto;
 import com.volasoftware.tinder.exception.*;
-import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.model.Verification;
@@ -60,7 +60,7 @@ public class UserService {
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setPassword(encodePassword().encode(userDto.getPassword()));
-        user.setGender(Gender.valueOf(userDto.getGender()));
+        user.setGender(userDto.getGender());
         user.setEnabled(false);
         user.setRole(Role.USER);
         userRepository.saveAndFlush(user);
@@ -83,7 +83,7 @@ public class UserService {
         user.setEmail(input.getEmail());
         user.setFirstName(input.getFirstName());
         user.setLastName(input.getLastName());
-        user.setGender(Gender.valueOf(input.getGender()));
+        user.setGender(input.getGender());
         userRepository.saveAndFlush(user);
     }
 
@@ -114,5 +114,11 @@ public class UserService {
     return userRepository
         .findOneByEmail(currentUser)
         .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
+    }
+
+    public UserProfileDto getUserProfile(){
+        User user = getLoggedUser();
+
+        return new UserProfileDto(user.getFirstName(),user.getLastName(),user.getEmail(),user.getGender());
     }
 }

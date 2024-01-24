@@ -1,13 +1,12 @@
 package com.volasoftware.tinder.dto;
 
-import com.volasoftware.tinder.annotation.Password;
 import com.volasoftware.tinder.model.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class UserDto {
+public class UserProfileDto {
 
   @NotBlank(message = "No first name provided")
   @Pattern(regexp = "^[A-Za-z]*$", message = "Must contain only letters")
@@ -19,10 +18,6 @@ public class UserDto {
   @Size(min = 2, max = 50, message = "The size must be between 2 and 50 letters")
   private String lastName;
 
-  @NotBlank(message = "No password provided")
-  @Password
-  private String password;
-
   @NotBlank(message = "No email provided")
   @Email
   private String email;
@@ -30,10 +25,7 @@ public class UserDto {
   @NotBlank(message = "No gender provided")
   private Gender gender;
 
-  public UserDto(String firstName,
-                 String lastName,
-                 String email,
-                 Gender gender) {
+  public UserProfileDto(String firstName, String lastName, String email, Gender gender) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -54,14 +46,6 @@ public class UserDto {
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 
   public String getEmail() {

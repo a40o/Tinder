@@ -2,6 +2,7 @@ package com.volasoftware.tinder.controller;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
 import com.volasoftware.tinder.dto.UserDto;
+import com.volasoftware.tinder.dto.UserProfileDto;
 import com.volasoftware.tinder.jwt.JwtService;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.services.UserService;
@@ -33,6 +34,12 @@ public class UserController {
   @GetMapping("/{id}")
   public User getUser(@PathVariable Long id) {
     return userService.getById(id).get();
+  }
+
+  @GetMapping("/profile")
+  @SecurityRequirement(name = "bearer")
+  public UserProfileDto getUserProfile(){
+    return userService.getUserProfile();
   }
 
   @PostMapping("/register")
