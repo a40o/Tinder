@@ -2,10 +2,7 @@ package com.volasoftware.tinder.services;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
 import com.volasoftware.tinder.dto.UserDto;
-import com.volasoftware.tinder.exception.EmailAlreadyRegisteredException;
-import com.volasoftware.tinder.exception.PasswordDoesNotMatchException;
-import com.volasoftware.tinder.exception.UserDoesNotExistException;
-import com.volasoftware.tinder.exception.UserIsNotVerifiedException;
+import com.volasoftware.tinder.exception.*;
 import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
@@ -14,7 +11,8 @@ import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -77,7 +75,16 @@ public class UserService {
 
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
-                    verificationService.setVerificationLink(String.valueOf(token)));
+                    verificationService.setVerificationLink(token.getToken()));
+    }
+
+    public void editUser(UserDto input) throws MessagingException, IOException{
+        User user = getLoggedUser();
+        user.setEmail(input.getEmail());
+        user.setFirstName(input.getFirstName());
+        user.setLastName(input.getLastName());
+        user.setGender(Gender.valueOf(input.getGender()));
+        userRepository.saveAndFlush(user);
     }
 
     public User loginUser(LoginUserDto input) {
@@ -99,5 +106,13 @@ public class UserService {
 
     public UserDetailsService getUserByUsername() {
         return username -> userRepository.findOneByEmail(username).orElseThrow();
+    }
+
+    public User getLoggedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = authentication.getName();
+    return userRepository
+        .findOneByEmail(currentUser)
+        .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
     }
 }

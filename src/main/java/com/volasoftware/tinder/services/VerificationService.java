@@ -91,6 +91,6 @@ public class VerificationService{
             Path path = Path.of(emailFile.getPath());
             String emailContent = Files.readString(path);
 
-            return  emailContent.replace("{{token}}" , hostLink + "verify/" + token);
+            return  emailContent.replace("{{token}}" , hostLink + "api/v1/users/verify/" + token);
         }
 }
