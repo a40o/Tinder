@@ -1,8 +1,8 @@
 package com.volasoftware.tinder.services;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
+import com.volasoftware.tinder.dto.FullUserDto;
 import com.volasoftware.tinder.dto.UserDto;
-import com.volasoftware.tinder.dto.UserProfileDto;
 import com.volasoftware.tinder.exception.*;
 import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
@@ -49,18 +49,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void registerUser(UserDto userDto) throws MessagingException, IOException {
+    public void registerUser(FullUserDto fullUserDto) throws MessagingException, IOException {
 
-        if(userRepository.findOneByEmail(userDto.getEmail()).isPresent()) {
+        if(userRepository.findOneByEmail(fullUserDto.getEmail()).isPresent()) {
             throw new EmailAlreadyRegisteredException("This email is already registered!");
         }
 
         User user = new User();
-        user.setEmail(userDto.getEmail());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setPassword(encodePassword().encode(userDto.getPassword()));
-        user.setGender(userDto.getGender());
+        user.setEmail(fullUserDto.getEmail());
+        user.setFirstName(fullUserDto.getFirstName());
+        user.setLastName(fullUserDto.getLastName());
+        user.setPassword(encodePassword().encode(fullUserDto.getPassword()));
+        user.setGender(fullUserDto.getGender());
         user.setEnabled(false);
         user.setRole(Role.USER);
         userRepository.saveAndFlush(user);
@@ -78,7 +78,7 @@ public class UserService {
                     verificationService.setVerificationLink(token.getToken()));
     }
 
-    public void editUser(UserDto input) throws MessagingException, IOException{
+    public void editUser(FullUserDto input) throws MessagingException, IOException{
         User user = getLoggedUser();
         user.setEmail(input.getEmail());
         user.setFirstName(input.getFirstName());
@@ -116,9 +116,9 @@ public class UserService {
         .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
     }
 
-    public UserProfileDto getUserProfile(){
+    public UserDto getUserProfile(){
         User user = getLoggedUser();
 
-        return new UserProfileDto(user.getFirstName(),user.getLastName(),user.getEmail(),user.getGender());
+        return new UserDto(user.getFirstName(), user.getLastName(), user.getEmail(), user.getGender());
     }
 }

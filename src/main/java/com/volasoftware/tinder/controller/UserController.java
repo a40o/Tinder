@@ -1,8 +1,8 @@
 package com.volasoftware.tinder.controller;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
+import com.volasoftware.tinder.dto.FullUserDto;
 import com.volasoftware.tinder.dto.UserDto;
-import com.volasoftware.tinder.dto.UserProfileDto;
 import com.volasoftware.tinder.jwt.JwtService;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.services.UserService;
@@ -38,14 +38,14 @@ public class UserController {
 
   @GetMapping("/profile")
   @SecurityRequirement(name = "bearer")
-  public UserProfileDto getUserProfile(){
+  public UserDto getUserProfile(){
     return userService.getUserProfile();
   }
 
   @PostMapping("/register")
-  public ResponseEntity registerNewUser(@Valid @RequestBody UserDto userDto)
+  public ResponseEntity registerNewUser(@Valid @RequestBody FullUserDto fullUserDto)
       throws MessagingException, IOException {
-    userService.registerUser(userDto);
+    userService.registerUser(fullUserDto);
 
     return ResponseEntity.ok(HttpStatus.OK);
   }
@@ -73,9 +73,9 @@ public class UserController {
 
   @PutMapping("/profile")
   @SecurityRequirement(name = "bearer")
-  public ResponseEntity editUser(@Valid @RequestBody UserDto userDto)
+  public ResponseEntity editUser(@Valid @RequestBody FullUserDto fullUserDto)
       throws MessagingException, IOException {
-    userService.editUser(userDto);
+    userService.editUser(fullUserDto);
     return ResponseEntity.ok(HttpStatus.OK);
   }
 }
