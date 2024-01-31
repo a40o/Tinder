@@ -22,7 +22,7 @@ public class UserDto {
   @Email
   private String email;
 
-  @NotBlank(message = "No gender provided")
+  //@NotBlank(message = "No gender provided")
   private Gender gender;
 
   public UserDto(String firstName, String lastName, String email, Gender gender) {
@@ -30,6 +30,9 @@ public class UserDto {
     this.lastName = lastName;
     this.email = email;
     this.gender = gender;
+  }
+
+  public UserDto() {
   }
 
   public String getFirstName() {

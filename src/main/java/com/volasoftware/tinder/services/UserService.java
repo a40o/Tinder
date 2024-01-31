@@ -29,20 +29,20 @@ public class UserService {
     private final VerificationRepository verificationRepository;
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
+
+    private final BCryptPasswordEncoder passwordEncoder;
     private final Set<User> users = new HashSet<User>();
-    @Bean
-    private final BCryptPasswordEncoder encodePassword(){
-        return new BCryptPasswordEncoder();
-    };
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
                        EmailSenderService emailSenderService,
-                       VerificationService verificationService) {
+                       VerificationService verificationService,
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.emailSenderService = emailSenderService;
         this.verificationService = verificationService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAll() {
@@ -59,11 +59,11 @@ public class UserService {
         user.setEmail(fullUserDto.getEmail());
         user.setFirstName(fullUserDto.getFirstName());
         user.setLastName(fullUserDto.getLastName());
-        user.setPassword(encodePassword().encode(fullUserDto.getPassword()));
+        user.setPassword(passwordEncoder.encode(fullUserDto.getPassword()));
         user.setGender(fullUserDto.getGender());
         user.setEnabled(false);
         user.setRole(Role.USER);
-        userRepository.saveAndFlush(user);
+        user = userRepository.saveAndFlush(user);
         users.add(user);
 
         Verification token = new Verification();
@@ -71,7 +71,7 @@ public class UserService {
         token.setToken(UUID.randomUUID().toString());
         token.setCreatedDate(LocalDateTime.now());
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
-        verificationRepository.saveAndFlush(token);
+        token = verificationRepository.saveAndFlush(token);
 
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
@@ -91,7 +91,7 @@ public class UserService {
 
         User user = userRepository.findOneByEmail(input.getEmail()).orElseThrow(
                 () -> new UserDoesNotExistException("User with this email does not exist"));
-        if (!encodePassword().matches(input.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(input.getPassword(), user.getPassword())) {
             throw new PasswordDoesNotMatchException("Password does not match");
         }
         if(!user.isEnabled()){

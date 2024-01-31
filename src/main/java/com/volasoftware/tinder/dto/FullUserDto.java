@@ -14,6 +14,10 @@ public class FullUserDto extends UserDto {
     super(firstName, lastName, email, gender);
   }
 
+  public FullUserDto() {
+      super();
+  }
+
   public String getPassword() {
     return password;
   }
