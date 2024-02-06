@@ -10,16 +10,15 @@ import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import com.volasoftware.tinder.services.EmailSenderService;
 import com.volasoftware.tinder.services.UserService;
-import com.volasoftware.tinder.services.VerificationService;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 
@@ -27,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @DataJpaTest
@@ -37,7 +37,6 @@ public class UserServiceTest {
   @Mock UserRepository userRepository;
   @Mock VerificationRepository verificationRepository;
   @Mock EmailSenderService emailSenderService;
-  @Mock VerificationService verificationService;
 
   @Mock BCryptPasswordEncoder passwordEncoder;
 
@@ -75,7 +74,6 @@ public class UserServiceTest {
     when(userRepository.findOneByEmail(userDto.getEmail())).thenReturn(Optional.empty());
     when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
     when(verificationRepository.saveAndFlush(any(Verification.class))).thenReturn(token);
-    // doNothing().when(emailSenderService).sendEmail(any(), anySet(), any());
 
     userService.registerUser(userDto);
 
@@ -83,5 +81,61 @@ public class UserServiceTest {
     verify(verificationRepository, times(1)).saveAndFlush(any(Verification.class));
     verify(emailSenderService, times(1))
         .sendEmail("Verification", Collections.singleton(user.getEmail()), "token");
+  }
+
+  @Test
+  public void testEditUser() throws MessagingException, IOException {
+    User user = new User();
+    user.setEmail("test@test.com");
+    user.setFirstName("Test");
+    user.setLastName("Testov");
+    user.setGender(Gender.FEMALE);
+
+    FullUserDto input = new FullUserDto();
+    input.setEmail("test@test.com");
+    input.setFirstName("Tested");
+    input.setLastName("User");
+    input.setGender(Gender.MALE);
+
+    when(userRepository.findOneByEmail(input.getEmail())).thenReturn(Optional.empty());
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getName()).thenReturn(user.getEmail());
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    when(userRepository.findOneByEmail(authentication.getName())).thenReturn(Optional.of(user));
+    when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
+
+
+    userService.editUser(input);
+
+    assertEquals(input.getEmail(), user.getEmail());
+    assertEquals(input.getFirstName(), user.getFirstName());
+    assertEquals(input.getLastName(), user.getLastName());
+    assertEquals(input.getGender(), user.getGender());
+    verify(userRepository, times(1)).saveAndFlush(any(User.class));
+
+  }
+
+  @Test
+  public void testLoginUser() {
+    User loggedUser = new User();
+    loggedUser.setId(1L);
+    loggedUser.setEmail("test@test.com");
+
+    Authentication authentication = mock(Authentication.class);
+    when(authentication.getName()).thenReturn(loggedUser.getEmail());
+
+    SecurityContext securityContext = mock(SecurityContext.class);
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+
+    when(userRepository.findOneByEmail(authentication.getName())).thenReturn(Optional.of(loggedUser));
+
+    userService.getLoggedUser();
+
+    verify(userRepository,times(1)).findOneByEmail(authentication.getName());
   }
 }
