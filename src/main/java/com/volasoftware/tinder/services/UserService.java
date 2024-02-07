@@ -1,9 +1,9 @@
 package com.volasoftware.tinder.services;
 
 import com.volasoftware.tinder.dto.LoginUserDto;
+import com.volasoftware.tinder.dto.FullUserDto;
 import com.volasoftware.tinder.dto.UserDto;
 import com.volasoftware.tinder.exception.*;
-import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
 import com.volasoftware.tinder.model.Verification;
@@ -29,41 +29,41 @@ public class UserService {
     private final VerificationRepository verificationRepository;
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
+
+    private final BCryptPasswordEncoder passwordEncoder;
     private final Set<User> users = new HashSet<User>();
-    @Bean
-    private final BCryptPasswordEncoder encodePassword(){
-        return new BCryptPasswordEncoder();
-    };
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
                        EmailSenderService emailSenderService,
-                       VerificationService verificationService) {
+                       VerificationService verificationService,
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.emailSenderService = emailSenderService;
         this.verificationService = verificationService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    public void registerUser(UserDto userDto) throws MessagingException, IOException {
+    public void registerUser(FullUserDto fullUserDto) throws MessagingException, IOException {
 
-        if(userRepository.findOneByEmail(userDto.getEmail()).isPresent()) {
+        if(userRepository.findOneByEmail(fullUserDto.getEmail()).isPresent()) {
             throw new EmailAlreadyRegisteredException("This email is already registered!");
         }
 
         User user = new User();
-        user.setEmail(userDto.getEmail());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setPassword(encodePassword().encode(userDto.getPassword()));
-        user.setGender(Gender.valueOf(userDto.getGender()));
+        user.setEmail(fullUserDto.getEmail());
+        user.setFirstName(fullUserDto.getFirstName());
+        user.setLastName(fullUserDto.getLastName());
+        user.setPassword(passwordEncoder.encode(fullUserDto.getPassword()));
+        user.setGender(fullUserDto.getGender());
         user.setEnabled(false);
         user.setRole(Role.USER);
-        userRepository.saveAndFlush(user);
+        user = userRepository.saveAndFlush(user);
         users.add(user);
 
         Verification token = new Verification();
@@ -71,19 +71,19 @@ public class UserService {
         token.setToken(UUID.randomUUID().toString());
         token.setCreatedDate(LocalDateTime.now());
         token.setExpirationDate(LocalDateTime.now().plusDays(2));
-        verificationRepository.saveAndFlush(token);
+        token = verificationRepository.saveAndFlush(token);
 
             emailSenderService.sendEmail("Verification",
                     Collections.singleton(user.getEmail()),
                     verificationService.setVerificationLink(token.getToken()));
     }
 
-    public void editUser(UserDto input) throws MessagingException, IOException{
+    public void editUser(FullUserDto input) throws MessagingException, IOException{
         User user = getLoggedUser();
         user.setEmail(input.getEmail());
         user.setFirstName(input.getFirstName());
         user.setLastName(input.getLastName());
-        user.setGender(Gender.valueOf(input.getGender()));
+        user.setGender(input.getGender());
         userRepository.saveAndFlush(user);
     }
 
@@ -91,7 +91,7 @@ public class UserService {
 
         User user = userRepository.findOneByEmail(input.getEmail()).orElseThrow(
                 () -> new UserDoesNotExistException("User with this email does not exist"));
-        if (!encodePassword().matches(input.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(input.getPassword(), user.getPassword())) {
             throw new PasswordDoesNotMatchException("Password does not match");
         }
         if(!user.isEnabled()){
@@ -114,5 +114,11 @@ public class UserService {
     return userRepository
         .findOneByEmail(currentUser)
         .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
+    }
+
+    public UserDto getUserProfile(){
+        User user = getLoggedUser();
+
+        return new UserDto(user.getFirstName(), user.getLastName(), user.getEmail(), user.getGender());
     }
 }
