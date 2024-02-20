@@ -78,4 +78,11 @@ public class UserController {
     userService.editUser(fullUserDto);
     return ResponseEntity.ok(HttpStatus.OK);
   }
+
+  @PostMapping("/forgotten-password")
+  public ResponseEntity forgotPassword(String email)
+          throws MessagingException, IOException{
+    userService.generateNewPassword(email);
+    return ResponseEntity.ok(HttpStatus.OK);
+  }
 }

@@ -21,11 +21,6 @@ public class WebSecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String[] WHITELIST = {

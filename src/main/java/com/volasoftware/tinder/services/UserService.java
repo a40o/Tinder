@@ -10,7 +10,7 @@ import com.volasoftware.tinder.model.Verification;
 import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import jakarta.mail.MessagingException;
-import org.springframework.context.annotation.Bean;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -114,6 +114,20 @@ public class UserService {
     return userRepository
         .findOneByEmail(currentUser)
         .orElseThrow(() -> new UserDoesNotExistException("User not found!"));
+    }
+
+    public void generateNewPassword(String email) throws IOException, MessagingException {
+    User user =
+        userRepository.findOneByEmail(email).orElseThrow(() -> new UserDoesNotExistException("User does not exist"));
+
+        String passwordCharacters = "1234567890abcdefghijklmnopqrstuvwxyz";
+        String newPassword = RandomStringUtils.random(8, passwordCharacters);
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        emailSenderService.sendEmail("New Password",
+                Collections.singleton(user.getEmail()),
+                verificationService.injectNewPassword(newPassword));
     }
 
     public UserDto getUserProfile(){
