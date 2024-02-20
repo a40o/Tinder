@@ -82,7 +82,7 @@ public class UserController {
   @PostMapping("/forgotten-password")
   public ResponseEntity forgotPassword(String email)
           throws MessagingException, IOException{
-    userService.generateNewPassword(email);
+    userService.replaceOldPassword(email);
     return ResponseEntity.ok(HttpStatus.OK);
   }
 }
