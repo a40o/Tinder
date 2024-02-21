@@ -10,6 +10,7 @@ import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import com.volasoftware.tinder.services.EmailSenderService;
 import com.volasoftware.tinder.services.UserService;
+import com.volasoftware.tinder.utility.PasswordGenerator;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,6 +40,8 @@ public class UserServiceTest {
   @Mock EmailSenderService emailSenderService;
 
   @Mock BCryptPasswordEncoder passwordEncoder;
+
+  @Mock PasswordGenerator passwordGenerator;
 
   @InjectMocks UserService userService;
 
@@ -137,5 +140,23 @@ public class UserServiceTest {
     userService.getLoggedUser();
 
     verify(userRepository,times(1)).findOneByEmail(authentication.getName());
+  }
+
+  @Test
+  public void testReplaceOldPassword() throws MessagingException, IOException {
+    String email = "test@test.com";
+    String password = passwordGenerator.generatePassword();
+
+    User user = new User();
+    user.setEmail(email);
+    user.setPassword(password);
+
+    when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    when(userRepository.save(any(User.class))).thenReturn(user);
+    emailSenderService.sendEmail(
+        "New Password", Collections.singleton(user.getEmail()), user.getPassword());
+
+    verify(emailSenderService, times(1)).
+            sendEmail("New Password", Collections.singleton(user.getEmail()),password);
   }
 }
