@@ -11,7 +11,6 @@ import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import com.volasoftware.tinder.utility.PasswordGenerator;
 import jakarta.mail.MessagingException;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,24 +29,19 @@ public class UserService {
     private final VerificationRepository verificationRepository;
     private final EmailSenderService emailSenderService;
     private final VerificationService verificationService;
-
     private final BCryptPasswordEncoder passwordEncoder;
-
-    private final PasswordGenerator passwordGenerator;
     private final Set<User> users = new HashSet<User>();
 
     public UserService(UserRepository userRepository,
                        VerificationRepository verificationRepository,
                        EmailSenderService emailSenderService,
                        VerificationService verificationService,
-                       BCryptPasswordEncoder passwordEncoder,
-                       PasswordGenerator passwordGenerator) {
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.verificationRepository = verificationRepository;
         this.emailSenderService = emailSenderService;
         this.verificationService = verificationService;
         this.passwordEncoder = passwordEncoder;
-        this.passwordGenerator = passwordGenerator;
     }
 
     public List<User> getAll() {
@@ -125,13 +119,19 @@ public class UserService {
     User user =
         userRepository.findOneByEmail(email).orElseThrow(() -> new UserDoesNotExistException("User does not exist"));
 
-        String newPassword = passwordGenerator.generatePassword();
+        String newPassword = PasswordGenerator.generatePassword();
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
         emailSenderService.sendEmail("New Password",
                 Collections.singleton(user.getEmail()),
                 verificationService.injectNewPassword(newPassword));
+    }
+
+    public void changePassword(String password) throws MessagingException, IOException{
+        User user = getLoggedUser();
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
     }
 
     public UserDto getUserProfile(){
