@@ -85,4 +85,12 @@ public class UserController {
     userService.replaceOldPassword(email);
     return ResponseEntity.ok(HttpStatus.OK);
   }
+
+  @PutMapping("/password")
+  @SecurityRequirement(name = "bearer")
+  public ResponseEntity changePassword(String newPassword)
+          throws MessagingException, IOException{
+    userService.changePassword(newPassword);
+    return ResponseEntity.ok(HttpStatus.OK);
+  }
 }
