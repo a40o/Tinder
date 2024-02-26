@@ -93,4 +93,14 @@ public class VerificationService{
 
             return  emailContent.replace("{{token}}" , hostLink + "api/v1/users/verify/" + token);
         }
+
+        public String injectNewPassword(String password) throws IOException{
+            Resource emailResource = resourceLoader.getResource("classpath:emailResources/ForgottenPassword.html");
+
+            File emailFile = emailResource.getFile();
+            Path path = Path.of(emailFile.getPath());
+            String emailContent = Files.readString(path);
+
+            return emailContent.replace("{{password}}",password);
+        }
 }
