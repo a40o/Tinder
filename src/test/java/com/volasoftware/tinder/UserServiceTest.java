@@ -1,7 +1,6 @@
 package com.volasoftware.tinder;
 
 import com.volasoftware.tinder.dto.FullUserDto;
-import com.volasoftware.tinder.dto.UserDto;
 import com.volasoftware.tinder.model.Gender;
 import com.volasoftware.tinder.model.Role;
 import com.volasoftware.tinder.model.User;
@@ -10,6 +9,7 @@ import com.volasoftware.tinder.repository.UserRepository;
 import com.volasoftware.tinder.repository.VerificationRepository;
 import com.volasoftware.tinder.services.EmailSenderService;
 import com.volasoftware.tinder.services.UserService;
+import com.volasoftware.tinder.services.VerificationService;
 import com.volasoftware.tinder.utility.PasswordGenerator;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
@@ -37,11 +37,12 @@ public class UserServiceTest {
 
   @Mock UserRepository userRepository;
   @Mock VerificationRepository verificationRepository;
+
+  @Mock VerificationService verificationService;
+
   @Mock EmailSenderService emailSenderService;
 
   @Mock BCryptPasswordEncoder passwordEncoder;
-
-  @Mock PasswordGenerator passwordGenerator;
 
   @InjectMocks UserService userService;
 
@@ -145,7 +146,7 @@ public class UserServiceTest {
   @Test
   public void testReplaceOldPassword() throws MessagingException, IOException {
     String email = "test@test.com";
-    String password = passwordGenerator.generatePassword();
+    String password = PasswordGenerator.generatePassword();
 
     User user = new User();
     user.setEmail(email);
@@ -153,8 +154,11 @@ public class UserServiceTest {
 
     when(userRepository.findOneByEmail(user.getEmail())).thenReturn(Optional.of(user));
     when(userRepository.save(any(User.class))).thenReturn(user);
-    emailSenderService.sendEmail(
-        "New Password", Collections.singleton(user.getEmail()), user.getPassword());
+    doNothing().when(emailSenderService).sendEmail(
+            "New Password", Collections.singleton(user.getEmail()), user.getPassword());
+    when(verificationService.injectNewPassword(anyString())).thenReturn(user.getPassword());
+
+    userService.replaceOldPassword(email);
 
     verify(emailSenderService, times(1)).
             sendEmail("New Password", Collections.singleton(user.getEmail()),password);
