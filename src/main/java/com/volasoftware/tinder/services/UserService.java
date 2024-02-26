@@ -128,9 +128,9 @@ public class UserService {
                 verificationService.injectNewPassword(newPassword));
     }
 
-    public void changePassword(String password) throws MessagingException, IOException{
+    public void changePassword(String newPassword) throws MessagingException, IOException{
         User user = getLoggedUser();
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 
