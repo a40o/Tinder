@@ -22,7 +22,6 @@ public class UserDto {
   @Email
   private String email;
 
-  //@NotBlank(message = "No gender provided")
   private Gender gender;
 
   public UserDto(String firstName, String lastName, String email, Gender gender) {

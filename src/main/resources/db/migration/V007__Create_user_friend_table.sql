@@ -1,4 +1,4 @@
-CREATE TABLE user_friend(
+CREATE TABLE friends(
     USER_ID int not null,
     FRIEND_ID int not null,
     FOREIGN KEY (USER_ID) REFERENCES user(ID),
