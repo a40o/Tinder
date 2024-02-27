@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -39,6 +40,9 @@ public class User extends Auditable<String> implements UserDetails {
 
     @Column(name = "ROLE")
     private Role role;
+
+    @ManyToMany
+    private Set<User> friends;
 
     public long getId() {
         return id;
@@ -127,5 +131,13 @@ public class User extends Auditable<String> implements UserDetails {
 
     public Role getRole() {
         return role;
+    }
+
+    public Set<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<User> friends) {
+        this.friends = friends;
     }
 }
