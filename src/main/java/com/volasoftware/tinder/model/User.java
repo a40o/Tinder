@@ -1,12 +1,11 @@
 package com.volasoftware.tinder.model;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
+import org.hibernate.usertype.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +24,8 @@ public class User extends Auditable<String> implements UserDetails {
     @Column(name = "LAST_NAME")
     private String lastName;
 
+    private int age;
+
     @Column(name = "EMAIL")
     private String email;
 
@@ -35,6 +36,8 @@ public class User extends Auditable<String> implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
 
+    private UserType userType;
+
     @Column(name = "ENABLED")
     private boolean enabled;
 
@@ -42,7 +45,13 @@ public class User extends Auditable<String> implements UserDetails {
     private Role role;
 
     @ManyToMany
+    @JoinTable(
+            name = "friend",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private Set<User> friends;
+    @OneToOne
+    private Location location;
 
     public long getId() {
         return id;
@@ -68,6 +77,14 @@ public class User extends Auditable<String> implements UserDetails {
         this.lastName = lastName;
     }
 
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -88,6 +105,14 @@ public class User extends Auditable<String> implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     @Override
@@ -139,5 +164,13 @@ public class User extends Auditable<String> implements UserDetails {
 
     public void setFriends(Set<User> friends) {
         this.friends = friends;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
